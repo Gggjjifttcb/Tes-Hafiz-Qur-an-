@@ -95,19 +95,23 @@
 </head>
 <body>
   <div class="container">
-    <h1><p>Selamat datang di Web Test Hafalan nomor Ayat Alquran </p></h1>
-    <br>
+    <h1><p>Selamat datang di Web Test Hafalan Ayat Alquran</p></h1>
     <h2>Tes Acak Ayat Al-Qur'an</h2>
-    <input type="number" id="jumlahAngka" placeholder="Masukkan jumlah ayat yang ingin diacak" min="1" max="286">
+    
     <select id="surahSelect">
       <option value="">Pilih Surah</option>
     </select>
+    
+    <input type="number" id="jumlahAngka" placeholder="Masukkan jumlah ayat" min="1">
+
     <button onclick="mulaiAcak()">Mulai Acak</button>
     <div id="output">0</div>
     <div class="info" id="info">Belum ada angka diacak</div>
+    
     <button onclick="tampilkanAngka()">Tampilkan Angka</button>
     <button onclick="lihatAyat()">Lihat Ayat</button>
     <button onclick="resetSemua()" style="background:#e53935;">Reset</button>
+    
     <div id="ayatResult"></div>
   </div>
 
@@ -129,12 +133,30 @@
       });
     }
 
+    document.getElementById('surahSelect').addEventListener('change', function () {
+      const surahId = this.value;
+      const surah = daftarSurah.find(s => s.number == surahId);
+      if (surah) {
+        document.getElementById('jumlahAngka').max = surah.numberOfVerses;
+        document.getElementById('jumlahAngka').placeholder = `Jumlah maksimal: ${surah.numberOfVerses}`;
+      }
+    });
+
     function mulaiAcak() {
       const jumlah = parseInt(document.getElementById('jumlahAngka').value);
-      if (!jumlah || jumlah < 1) {
-        alert("Masukkan jumlah angka yang valid!");
+      const surahId = document.getElementById('surahSelect').value;
+      const surah = daftarSurah.find(s => s.number == surahId);
+
+      if (!surahId) {
+        alert("Pilih surah terlebih dahulu!");
         return;
       }
+
+      if (!jumlah || jumlah < 1 || jumlah > surah.numberOfVerses) {
+        alert(`Jumlah angka harus antara 1 dan ${surah.numberOfVerses} untuk surah ini!`);
+        return;
+      }
+
       angkaTersisa = Array.from({length: jumlah}, (_, i) => i + 1);
       acakArray(angkaTersisa);
       document.getElementById('info').textContent = `Siap mengacak ${jumlah} angka`;
@@ -199,4 +221,4 @@
     loadSurah();
   </script>
 </body>
-  </html>
+</html>
