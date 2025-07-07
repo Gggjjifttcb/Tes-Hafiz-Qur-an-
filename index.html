@@ -110,6 +110,7 @@
     
     <button onclick="tampilkanAngka()">Tampilkan Angka</button>
     <button onclick="lihatAyat()">Lihat Ayat</button>
+    <button onclick="putarAudio()">Putar Audio</button>
     <button onclick="resetSemua()" style="background:#e53935;">Reset</button>
     
     <div id="ayatResult"></div>
@@ -119,6 +120,7 @@
     let angkaTersisa = [];
     let angkaSekarang = 0;
     let daftarSurah = [];
+    let currentAudio = null;
 
     async function loadSurah() {
       const res = await fetch('https://api.quran.gading.dev/surah');
@@ -208,7 +210,34 @@
       `;
     }
 
+    async function putarAudio() {
+      const surahId = document.getElementById('surahSelect').value;
+      if (!surahId || angkaSekarang === 0) {
+        alert("Tampilkan angka dan ayat terlebih dahulu!");
+        return;
+      }
+
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+      }
+
+      const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}/${angkaSekarang}`);
+      const data = await res.json();
+      const audioUrl = data.data.audio.primary;
+
+      currentAudio = new Audio(audioUrl);
+      currentAudio.play().catch(e => alert("Gagal memutar audio: " + e.message));
+    }
+
     function resetSemua() {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+      }
+
       angkaTersisa = [];
       angkaSekarang = 0;
       document.getElementById('output').textContent = "0";
