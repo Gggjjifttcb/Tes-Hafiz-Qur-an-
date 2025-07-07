@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Tes Hafalan Al-Qur'an</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      background: linear-gradient(145deg, #dbe9f4, #ffffff);
       margin: 0;
       padding: 0;
       display: flex;
@@ -18,28 +18,27 @@
     }
     .container {
       margin-top: 40px;
-      background: #fdfdfd;
+      background: #f4f8fb;
       padding: 30px 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-width: 700px;
+      border-radius: 16px;
+      box-shadow: 10px 10px 30px #d1d9e6, -10px -10px 30px #ffffff;
+      max-width: 720px;
       width: 95%;
     }
     h2 {
       text-align: center;
       color: #2c3e50;
-      margin-bottom: 20px;
     }
     select, input, button {
       font-size: 16px;
-      padding: 12px;
+      padding: 10px;
       width: 100%;
       margin: 10px 0;
       border: 1px solid #ccc;
-      border-radius: 12px;
+      border-radius: 10px;
     }
     button {
-      background: #00bcd4;
+      background: #4a90e2;
       color: white;
       font-weight: bold;
       cursor: pointer;
@@ -47,33 +46,40 @@
       transition: background 0.3s ease;
     }
     button:hover {
-      background: #0097a7;
+      background: #357ab8;
     }
     .soalBox {
       margin-top: 30px;
       background: #fff;
       padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-    .audioPlayer {
-      margin: 20px 0;
-      text-align: center;
+    .arabic {
+      font-size: 24px;
+      direction: rtl;
+      text-align: right;
+      color: #2d3436;
+      margin-bottom: 20px;
     }
     .option {
-      background: #e1f5fe;
-      padding: 12px 15px;
+      background: #eaf1f7;
+      padding: 10px 15px;
       margin: 8px 0;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s ease;
+      display: flex;
+      align-items: center;
     }
     .option:hover {
-      background: #b3e5fc;
+      background: #d6e5f3;
     }
-    .option.disabled {
-      pointer-events: none;
-      opacity: 0.6;
+    .label-huruf {
+      font-weight: bold;
+      width: 24px;
+      display: inline-block;
+      margin-right: 10px;
     }
     .info {
       font-size: 14px;
@@ -82,7 +88,19 @@
     }
     #feedback {
       font-weight: bold;
-      margin-top: 15px;
+      margin-top: 10px;
+    }
+    audio {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .instructions {
+      background: #eef5fa;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
     }
   </style>
 </head>
@@ -90,22 +108,28 @@
   <div class="container">
     <h2>Tes Hafalan Al-Qur'an</h2>
 
-    <select id="surahSelect" onchange="tampilkanJumlahAyat()">
-      <option value="">Pilih Surah</option>
+    <select id="modeSelect" onchange="tampilkanPilihan()">
+      <option value="">-- Pilih Mode --</option>
+      <option value="surah">Berdasarkan Surah</option>
+      <option value="juz">Berdasarkan Juz</option>
     </select>
-    <p id="infoAyat" class="info"></p>
 
-    <input type="number" id="jumlahAyat" placeholder="Jumlah ayat yang dites, contoh: 10" min="2">
+    <div id="pilihanSurahJuz"></div>
+
+    <input type="number" id="jumlahSoal" placeholder="Jumlah soal (min 4)" min="4">
+
     <button onclick="mulaiTes()">Mulai Tes</button>
+
+    <div class="instructions">
+      ✅ Pilih jawaban ayat <strong>selanjutnya</strong> dari pilihan ganda di bawah ini (A, B, C, D).
+    </div>
 
     <div id="soalContainer" class="soalBox" style="display:none;">
       <div class="info" id="soalKe"></div>
-      <div class="audioPlayer">
-        <audio id="audioAyat" controls></audio>
-      </div>
+      <audio id="audioAyat" controls></audio>
       <div id="opsiJawaban"></div>
       <div id="feedback"></div>
-      <button onclick="soalBerikutnya()">Soal Berikutnya</button>
+      <button id="btnNext" onclick="soalBerikutnya()">Soal Berikutnya</button>
     </div>
   </div>
 
@@ -114,82 +138,90 @@
     let semuaAyat = [];
     let soalList = [];
     let indexSoal = 0;
-    let totalSoal = 0;
+    let benar = 0, salah = 0;
+    let audio;
 
     async function loadSurah() {
       const res = await fetch('https://api.quran.gading.dev/surah');
       const data = await res.json();
       daftarSurah = data.data;
-      const select = document.getElementById('surahSelect');
-      daftarSurah.forEach(surah => {
-        const option = document.createElement('option');
-        option.value = surah.number;
-        option.textContent = `${surah.number}. ${surah.name.transliteration.id}`;
-        select.appendChild(option);
-      });
     }
 
-    function tampilkanJumlahAyat() {
-      const surahId = document.getElementById('surahSelect').value;
-      const surah = daftarSurah.find(s => s.number == surahId);
-      if (surah) {
-        document.getElementById('infoAyat').textContent = 
-          `Surah ini memiliki ${surah.numberOfVerses} ayat.`;
+    function tampilkanPilihan() {
+      const mode = document.getElementById('modeSelect').value;
+      const container = document.getElementById('pilihanSurahJuz');
+      container.innerHTML = '';
+
+      const select = document.createElement('select');
+      if (mode === 'surah') {
+        select.id = 'surahSelect';
+        daftarSurah.forEach(surah => {
+          const option = document.createElement('option');
+          option.value = surah.number;
+          option.textContent = `${surah.number}. ${surah.name.transliteration.id}`;
+          select.appendChild(option);
+        });
+      } else if (mode === 'juz') {
+        select.id = 'juzSelect';
+        for (let i = 1; i <= 30; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = `Juz ${i}`;
+          select.appendChild(option);
+        }
       }
+      container.appendChild(select);
     }
 
     async function mulaiTes() {
-      const surahId = document.getElementById('surahSelect').value;
-      const jumlahInput = parseInt(document.getElementById('jumlahAyat').value);
-
-      if (!surahId || !jumlahInput || jumlahInput < 2) {
-        alert("Pilih surah dan jumlah ayat minimal 2!");
+      const mode = document.getElementById('modeSelect').value;
+      const jumlah = parseInt(document.getElementById('jumlahSoal').value);
+      if (!mode || !jumlah || jumlah < 4) {
+        alert("Lengkapi pilihan dan jumlah soal (min 4)!");
         return;
       }
 
-      const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}`);
-      const data = await res.json();
-      semuaAyat = data.data.verses;
-
-      if (jumlahInput > semuaAyat.length) {
-        alert(`Jumlah ayat maksimal adalah ${semuaAyat.length}`);
-        return;
+      let ayatData = [];
+      if (mode === 'surah') {
+        const surahId = document.getElementById('surahSelect').value;
+        const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}`);
+        const data = await res.json();
+        ayatData = data.data.verses;
+      } else if (mode === 'juz') {
+        const juzId = document.getElementById('juzSelect').value;
+        const res = await fetch(`https://api.quran.gading.dev/juz/${juzId}`);
+        const data = await res.json();
+        ayatData = data.data.verses;
       }
 
-      const jumlahSoal = Math.floor(jumlahInput * 0.25);
-      if (jumlahSoal < 1) {
-        alert("Jumlah soal terlalu sedikit. Tingkatkan jumlah ayat yang diinput.");
-        return;
+      semuaAyat = ayatData;
+      const soalJumlah = jumlah;
+      const indeksSoal = [];
+
+      while (indeksSoal.length < soalJumlah) {
+        let i = Math.floor(Math.random() * (semuaAyat.length - 1));
+        if (!indeksSoal.includes(i) && i + 1 < semuaAyat.length) {
+          indeksSoal.push(i);
+        }
       }
 
-      soalList = [];
-      const nomorSoal = [];
-      while (nomorSoal.length < jumlahSoal) {
-        let acak = Math.floor(Math.random() * (jumlahInput - 1)); // -1 supaya tidak ambil ayat terakhir
-        if (!nomorSoal.includes(acak)) nomorSoal.push(acak);
-      }
-
-      nomorSoal.forEach(i => {
-        const pertanyaan = semuaAyat[i];
-        const jawabanBenar = semuaAyat[i + 1]?.text.arab || "";
-        const soal = {
-          audioUrl: pertanyaan.audio.primary,
-          jawabanBenar: jawabanBenar,
-          opsi: ambilPilihan(i + 1)
-        };
-        soalList.push(soal);
-      });
+      soalList = indeksSoal.map(i => ({
+        audio: semuaAyat[i].audio.primary,
+        jawabanBenar: semuaAyat[i + 1].text.arab,
+        opsi: ambilPilihan(i + 1)
+      }));
 
       indexSoal = 0;
-      totalSoal = soalList.length;
+      benar = 0;
+      salah = 0;
       tampilkanSoal();
     }
 
     function ambilPilihan(jawabanIndex) {
-      let opsi = [semuaAyat[jawabanIndex].text.arab];
+      const opsi = [semuaAyat[jawabanIndex].text.arab];
       while (opsi.length < 4) {
-        let randomIndex = Math.floor(Math.random() * semuaAyat.length);
-        let ayat = semuaAyat[randomIndex].text.arab;
+        const randomIndex = Math.floor(Math.random() * semuaAyat.length);
+        const ayat = semuaAyat[randomIndex].text.arab;
         if (!opsi.includes(ayat)) opsi.push(ayat);
       }
       return opsi.sort(() => Math.random() - 0.5);
@@ -198,44 +230,42 @@
     function tampilkanSoal() {
       const soal = soalList[indexSoal];
       document.getElementById('soalContainer').style.display = 'block';
-      document.getElementById('soalKe').textContent = `Soal ${indexSoal + 1} dari ${totalSoal}`;
-      document.getElementById('audioAyat').src = soal.audioUrl;
-
+      document.getElementById('soalKe').textContent = `Soal ${indexSoal + 1} dari ${soalList.length}`;
       const opsiDiv = document.getElementById('opsiJawaban');
       opsiDiv.innerHTML = "";
-      soal.opsi.forEach(pilihan => {
+
+      audio = document.getElementById('audioAyat');
+      audio.src = soal.audio;
+      audio.play();
+
+      const huruf = ['A', 'B', 'C', 'D'];
+      soal.opsi.forEach((pilihan, i) => {
         const div = document.createElement('div');
         div.className = "option";
-        div.textContent = pilihan;
-        div.onclick = () => periksaJawaban(div, pilihan);
+        div.innerHTML = `<span class="label-huruf">${huruf[i]}.</span> <span>${pilihan}</span>`;
+        div.onclick = () => periksaJawaban(pilihan, soal.jawabanBenar);
         opsiDiv.appendChild(div);
       });
 
       document.getElementById('feedback').textContent = "";
+      document.getElementById('btnNext').style.display = 'inline-block';
     }
 
-    function periksaJawaban(elemen, pilihan) {
-      const benar = soalList[indexSoal].jawabanBenar;
+    function periksaJawaban(pilihan, benarAyat) {
+      if (!audio.paused) audio.pause();
       const feedback = document.getElementById('feedback');
-      const opsi = document.querySelectorAll('.option');
-      const audio = document.getElementById('audioAyat');
+      const opsiDivs = document.querySelectorAll('.option');
 
-      audio.pause();
-      audio.currentTime = 0;
+      opsiDivs.forEach(div => div.onclick = null);
 
-      opsi.forEach(opt => {
-        opt.classList.add('disabled');
-        if (opt.textContent === benar) {
-          opt.style.background = "#a5d6a7";
-        }
-      });
-
-      if (pilihan === benar) {
+      if (pilihan === benarAyat) {
         feedback.textContent = "✅ Benar!";
         feedback.style.color = "green";
+        benar++;
       } else {
-        feedback.textContent = "❌ Salah!";
+        feedback.innerHTML = `❌ Salah!<br>✅ Jawaban yang benar: <span class="arabic">${benarAyat}</span>`;
         feedback.style.color = "red";
+        salah++;
       }
     }
 
@@ -245,8 +275,9 @@
         tampilkanSoal();
       } else {
         document.getElementById('soalContainer').innerHTML = `
-          <h3 style="text-align:center; color:green;">✅ Tes selesai! MasyaAllah!</h3>
-          <button onclick="location.reload()">Ulang Tes</button>
+          <h3>✅ Tes selesai! MasyaAllah!</h3>
+          <p>Jawaban Benar: ${benar}</p>
+          <p>Jawaban Salah: ${salah}</p>
         `;
       }
     }
@@ -254,4 +285,4 @@
     loadSurah();
   </script>
 </body>
-        </html>
+</html>
