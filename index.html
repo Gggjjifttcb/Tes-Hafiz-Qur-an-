@@ -1,118 +1,160 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Random Ayat Quran</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>Tes Hafalan Ayat Al-Qur'an</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Amiri&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --primary: #4a90e2;
+      --bg: #e8edf4;
+      --text: #2c3e50;
+      --glass: rgba(255, 255, 255, 0.6);
+      --border: rgba(255, 255, 255, 0.3);
+    }
     * {
       box-sizing: border-box;
     }
     body {
       margin: 0;
-      padding: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(145deg, #e3eaf3, #ffffff);
+      background: linear-gradient(to right, #dbe6f6, #c5796d);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 20px;
     }
     .container {
-      background: #f0f4f8;
-      padding: 40px 50px;
-      border-radius: 20px;
-      box-shadow: 10px 10px 30px #d1d9e6, -10px -10px 30px #ffffff;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      padding: 40px;
+      border-radius: 25px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+      width: 100%;
+      max-width: 650px;
+      color: var(--text);
       text-align: center;
-      max-width: 600px;
-      width: 90%;
+      transition: all 0.3s ease-in-out;
     }
-    #output {
-      font-size: 60px;
-      font-weight: 600;
-      margin: 20px 0;
-      color: #2d3436;
+    h1, h2 {
+      margin: 0 0 10px;
+      color: #1e272e;
+    }
+    select, input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+      transition: all 0.2s ease-in-out;
+    }
+    select:focus, input:focus {
+      outline: none;
+      background: #fff;
+      box-shadow: 0 0 0 2px var(--primary);
     }
     button {
-      padding: 12px 25px;
-      font-size: 16px;
-      font-weight: bold;
-      background: #4a90e2;
+      padding: 12px 24px;
+      margin: 8px 6px;
+      font-size: 15px;
+      font-weight: 600;
+      background: var(--primary);
       color: white;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      margin: 8px;
-      box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
-      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    button:hover:not(:disabled) {
-      background: #357ab8;
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(74, 144, 226, 0.4);
     }
     button:disabled {
-      background: #b0bec5;
+      background: #ccc;
       cursor: not-allowed;
     }
-    select, input {
-      padding: 10px;
-      font-size: 16px;
-      margin: 10px 0;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    #output {
+      font-size: 64px;
+      font-weight: bold;
+      color: var(--text);
+      margin: 20px 0;
+      user-select: none;
     }
-    .info, #ayatResult {
-      margin-top: 15px;
+    .info {
       font-size: 16px;
       color: #555;
+      min-height: 24px;
     }
     #ayatResult {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 25px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
       text-align: left;
-    }
-    #arabic {
-      font-size: 28px;
-      margin: 15px 0 10px;
-      color: #2d3436;
-      direction: rtl;
-      text-align: right;
-    }
-    #translation {
-      font-size: 16px;
-      color: #444;
-      margin-bottom: 10px;
+      border-left: 5px solid var(--primary);
     }
     #surahInfo {
+      font-size: 18px;
       font-weight: bold;
+      margin-bottom: 14px;
+    }
+    #arabic {
+      font-size: 34px;
+      font-family: 'Amiri', serif;
+      direction: rtl;
+      text-align: right;
+      line-height: 2;
+      margin-bottom: 14px;
+    }
+    #arabic .ayatNumber {
+      font-size: 22px;
+      color: var(--primary);
+      padding: 0 5px;
+    }
+    #translation {
+      font-size: 17px;
+      line-height: 1.7;
       color: #333;
-      margin-bottom: 10px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
+      #arabic {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1><p>Selamat datang di Web Test Hafalan Ayat Alquran</p></h1>
-    <h2>Tes Acak Ayat Al-Qur'an</h2>
-    
+    <h1>Web Tes Hafalan Nomor Ayat Al-Qur'an</h1>
+    <h2>Mode Acak Ayat</h2>
+
     <select id="surahSelect">
       <option value="">Pilih Surah</option>
     </select>
-    
-    <input type="number" id="jumlahAngka" placeholder="Masukkan jumlah ayat" min="1">
+
+    <input type="number" id="jumlahAngka" placeholder="Masukkan jumlah ayat" min="1" />
 
     <button onclick="mulaiAcak()">Mulai Acak</button>
+
     <div id="output">0</div>
     <div class="info" id="info">Belum ada angka diacak</div>
-    
+
     <button onclick="tampilkanAngka()">Tampilkan Angka</button>
     <button onclick="lihatAyat()">Lihat Ayat</button>
     <button onclick="putarAudio()">Putar Audio</button>
-    <button onclick="resetSemua()" style="background:#e53935;">Reset</button>
-    
+    <button onclick="resetSemua()" style="background: #e53935;">Reset</button>
+
     <div id="ayatResult"></div>
   </div>
 
@@ -136,11 +178,10 @@
     }
 
     document.getElementById('surahSelect').addEventListener('change', function () {
-      const surahId = this.value;
-      const surah = daftarSurah.find(s => s.number == surahId);
+      const surah = daftarSurah.find(s => s.number == this.value);
       if (surah) {
         document.getElementById('jumlahAngka').max = surah.numberOfVerses;
-        document.getElementById('jumlahAngka').placeholder = `Jumlah maksimal: ${surah.numberOfVerses}`;
+        document.getElementById('jumlahAngka').placeholder = `Maks: ${surah.numberOfVerses}`;
       }
     });
 
@@ -148,21 +189,15 @@
       const jumlah = parseInt(document.getElementById('jumlahAngka').value);
       const surahId = document.getElementById('surahSelect').value;
       const surah = daftarSurah.find(s => s.number == surahId);
-
-      if (!surahId) {
-        alert("Pilih surah terlebih dahulu!");
+      if (!surahId || !jumlah || jumlah < 1 || jumlah > surah.numberOfVerses) {
+        alert("Periksa surah dan jumlah ayat!");
         return;
       }
-
-      if (!jumlah || jumlah < 1 || jumlah > surah.numberOfVerses) {
-        alert(`Jumlah angka harus antara 1 dan ${surah.numberOfVerses} untuk surah ini!`);
-        return;
-      }
-
-      angkaTersisa = Array.from({length: jumlah}, (_, i) => i + 1);
+      angkaTersisa = Array.from({ length: jumlah }, (_, i) => i + 1);
       acakArray(angkaTersisa);
-      document.getElementById('info').textContent = `Siap mengacak ${jumlah} angka`;
+      angkaSekarang = 0;
       document.getElementById('output').textContent = "0";
+      document.getElementById('info').textContent = `Siap mengacak ${jumlah} angka`;
       document.getElementById('ayatResult').innerHTML = "";
     }
 
@@ -176,74 +211,56 @@
     function tampilkanAngka() {
       if (angkaTersisa.length === 0) {
         document.getElementById('output').textContent = "🎉";
-        document.getElementById('info').textContent = "Selesai! Semua angka sudah ditampilkan.";
+        document.getElementById('info').textContent = "Selesai! Semua angka telah ditampilkan.";
         return;
       }
       angkaSekarang = angkaTersisa.pop();
       document.getElementById('output').textContent = angkaSekarang;
       document.getElementById('info').textContent = `Sisa angka: ${angkaTersisa.length}`;
+      document.getElementById('ayatResult').innerHTML = "";
     }
 
     async function lihatAyat() {
       const surahId = document.getElementById('surahSelect').value;
-      if (!surahId) {
-        alert("Pilih surah terlebih dahulu!");
+      if (!surahId || angkaSekarang === 0) {
+        alert("Pilih surah dan tampilkan angka terlebih dahulu!");
         return;
       }
-      if (angkaSekarang === 0) {
-        alert("Tampilkan angka acak terlebih dahulu!");
-        return;
-      }
-
       const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}/${angkaSekarang}`);
       const data = await res.json();
       const ayat = data.data;
-
-      const namaSurah = ayat.surah.name.transliteration.id;
-      const nomorSurah = ayat.surah.number;
-      const nomorAyat = ayat.number.inSurah;
-
       document.getElementById('ayatResult').innerHTML = `
-        <div id="surahInfo">Surah ${namaSurah} (QS. ${nomorSurah}:${nomorAyat})</div>
-        <div id="arabic">${ayat.text.arab}</div>
+        <div id="surahInfo">Surah ${ayat.surah.name.transliteration.id} (QS. ${ayat.surah.number}:${ayat.number.inSurah})</div>
+        <div id="arabic">${ayat.text.arab} <span class="ayatNumber">﴿${ayat.number.inSurah}﴾</span></div>
         <div id="translation">${ayat.translation.id}</div>
       `;
     }
 
     async function putarAudio() {
+      if (!angkaSekarang) return;
       const surahId = document.getElementById('surahSelect').value;
-      if (!surahId || angkaSekarang === 0) {
-        alert("Tampilkan angka dan ayat terlebih dahulu!");
-        return;
-      }
-
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        currentAudio = null;
-      }
-
       const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}/${angkaSekarang}`);
       const data = await res.json();
       const audioUrl = data.data.audio.primary;
-
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
       currentAudio = new Audio(audioUrl);
-      currentAudio.play().catch(e => alert("Gagal memutar audio: " + e.message));
+      currentAudio.play();
     }
 
     function resetSemua() {
       if (currentAudio) {
         currentAudio.pause();
         currentAudio.currentTime = 0;
-        currentAudio = null;
       }
-
       angkaTersisa = [];
       angkaSekarang = 0;
       document.getElementById('output').textContent = "0";
       document.getElementById('info').textContent = "Belum ada angka diacak";
-      document.getElementById('jumlahAngka').value = "";
       document.getElementById('ayatResult').innerHTML = "";
+      document.getElementById('jumlahAngka').value = "";
       document.getElementById('surahSelect').selectedIndex = 0;
     }
 
