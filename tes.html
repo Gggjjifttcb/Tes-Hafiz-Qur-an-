@@ -104,6 +104,11 @@
       font-size: 14px;
       color: #333;
     }
+    .buttons-setelah-tes button {
+      margin-top: 10px;
+      display: inline-block;
+      width: 48%;
+    }
   </style>
 </head>
 <body>
@@ -139,6 +144,7 @@
     let daftarSurah = [];
     let semuaAyat = [];
     let soalList = [];
+    let soalListBackup = [];
     let indexSoal = 0;
     let benar = 0, salah = 0;
     let audio;
@@ -197,10 +203,9 @@
       }
 
       semuaAyat = ayatData;
-      const soalJumlah = jumlah;
       const indeksSoal = [];
 
-      while (indeksSoal.length < soalJumlah) {
+      while (indeksSoal.length < jumlah) {
         let i = Math.floor(Math.random() * (semuaAyat.length - 1));
         if (!indeksSoal.includes(i) && i + 1 < semuaAyat.length) {
           indeksSoal.push(i);
@@ -213,6 +218,7 @@
         opsi: ambilPilihan(i + 1)
       }));
 
+      soalListBackup = JSON.parse(JSON.stringify(soalList)); // Simpan untuk ulangi tes
       indexSoal = 0;
       benar = 0;
       salah = 0;
@@ -264,7 +270,7 @@
         feedback.style.color = "green";
         benar++;
       } else {
-        feedback.innerHTML = `❌ Salah!<br>✅ Jawaban yang benar: <span class="arabic">${benarAyat}</span>`;
+        feedback.innerHTML = `❌ Salah!<br><div style="margin-top:6px;">✅ Jawaban benar:<div class="arabic" style="margin-top:6px;">${benarAyat}</div></div>`;
         feedback.style.color = "red";
         salah++;
       }
@@ -275,15 +281,36 @@
         indexSoal++;
         tampilkanSoal();
       } else {
-        document.getElementById('soalContainer').innerHTML = `
+        const soalContainer = document.getElementById('soalContainer');
+        soalContainer.innerHTML = `
           <h3>✅ Tes selesai! MasyaAllah!</h3>
           <p>Jawaban Benar: ${benar}</p>
           <p>Jawaban Salah: ${salah}</p>
+          <div class="buttons-setelah-tes">
+            <button onclick="ulangiTes()">🔁 Ulangi Tes</button>
+            <button onclick="location.reload()">🔄 Tes Baru</button>
+          </div>
         `;
       }
+    }
+
+    function ulangiTes() {
+      soalList = JSON.parse(JSON.stringify(soalListBackup));
+      indexSoal = 0;
+      benar = 0;
+      salah = 0;
+      const soalContainer = document.getElementById('soalContainer');
+      soalContainer.innerHTML = `
+        <div class="info" id="soalKe"></div>
+        <audio id="audioAyat" controls></audio>
+        <div id="opsiJawaban"></div>
+        <div id="feedback"></div>
+        <button id="btnNext" onclick="soalBerikutnya()">Soal Berikutnya</button>
+      `;
+      tampilkanSoal();
     }
 
     loadSurah();
   </script>
 </body>
-  </html>
+</html>
