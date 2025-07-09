@@ -1,0 +1,354 @@
+<!DOCTYPE html>      
+<html lang="id">      
+<head>      
+  <meta charset="UTF-8" />      
+  <title>Tes Hafalan Ayat Al-Qur'an</title>      
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Amiri&display=swap" rel="stylesheet" />      
+  <style>      
+    :root {      
+      --primary: #4a90e2;      
+      --bg: #e8edf4;      
+      --text: #2c3e50;      
+      --glass: rgba(255, 255, 255, 0.6);      
+      --border: rgba(255, 255, 255, 0.3);      
+    }      
+    * {      
+      box-sizing: border-box;      
+    }      
+    body {      
+      margin: 0;      
+      font-family: 'Poppins', sans-serif;      
+      background: linear-gradient(to right, #dbe6f6, #c5796d);      
+      min-height: 100vh;      
+      display: flex;      
+      align-items: center;      
+      justify-content: center;      
+      padding: 20px;      
+    }      
+    .container {      
+      background: var(--glass);      
+      backdrop-filter: blur(12px);      
+      border: 1px solid var(--border);      
+      padding: 40px;      
+      border-radius: 25px;      
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);      
+      width: 100%;      
+      max-width: 700px;      
+      color: var(--text);      
+      text-align: center;      
+      transition: all 0.3s ease-in-out;      
+    }      
+    h1, h2 {      
+      margin: 0 0 10px;      
+      color: #1e272e;      
+    }      
+    select, input {      
+      width: 100%;      
+      padding: 12px;      
+      margin: 10px 0;      
+      border: none;      
+      border-radius: 12px;      
+      font-size: 16px;      
+      background: rgba(255, 255, 255, 0.8);      
+      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);      
+      transition: all 0.2s ease-in-out;      
+    }      
+    select:focus, input:focus {      
+      outline: none;      
+      background: #fff;      
+      box-shadow: 0 0 0 2px var(--primary);      
+    }      
+    button {      
+      padding: 12px 24px;      
+      margin: 8px 6px;      
+      font-size: 15px;      
+      font-weight: 600;      
+      background: var(--primary);      
+      color: white;      
+      border: none;      
+      border-radius: 12px;      
+      cursor: pointer;      
+      box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);      
+      transition: transform 0.2s, box-shadow 0.2s;      
+    }      
+    button:hover {      
+      transform: translateY(-2px);      
+      box-shadow: 0 8px 24px rgba(74, 144, 226, 0.4);      
+    }      
+    button:disabled {      
+      background: #ccc;      
+      cursor: not-allowed;      
+    }      
+    #output {      
+      font-size: 64px;      
+      font-weight: bold;      
+      color: var(--text);      
+      margin: 20px 0;      
+      user-select: none;      
+    }      
+    .info {      
+      font-size: 16px;      
+      color: #555;      
+      min-height: 24px;      
+    }      
+    #ayatResult {      
+      background: rgba(255, 255, 255, 0.7);      
+      backdrop-filter: blur(8px);      
+      border-radius: 16px;      
+      padding: 24px;      
+      margin-top: 25px;      
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);      
+      text-align: left;      
+      border-left: 5px solid var(--primary);      
+    }      
+    #surahInfo {      
+      font-size: 18px;      
+      font-weight: bold;      
+      margin-bottom: 14px;      
+    }      
+    #arabic {      
+      font-size: 34px;      
+      font-family: 'Amiri', serif;      
+      direction: rtl;      
+      text-align: right;      
+      line-height: 2;      
+      margin-bottom: 14px;      
+    }      
+    #arabic .ayatNumber {      
+      font-size: 22px;      
+      color: var(--primary);      
+      padding: 0 5px;      
+    }      
+    #translation {      
+      font-size: 17px;      
+      line-height: 1.7;      
+      color: #333;      
+    }      
+    #quizBox {      
+      margin-top: 25px;      
+      text-align: left;      
+    }      
+    .option {      
+      background: white;      
+      border: 1px solid #ccc;      
+      padding: 12px;      
+      border-radius: 12px;      
+      margin-bottom: 10px;      
+      cursor: pointer;      
+      transition: all 0.2s;      
+    }      
+    .option:hover {      
+      background: #f0f0f0;      
+    }      
+    .option.correct {      
+      background: #c8e6c9;      
+      border-color: green;      
+    }      
+    .option.wrong {      
+      background: #ffcdd2;      
+      border-color: red;      
+    }      
+    #result {      
+      margin-top: 20px;      
+      font-weight: bold;      
+    }      
+    #summaryBox {      
+      margin-top: 25px;      
+    }      
+    @media (max-width: 600px) {      
+      .container {      
+        padding: 30px 20px;      
+      }      
+      #arabic {      
+        font-size: 28px;      
+      }      
+    }      
+  </style>      
+</head>      
+<body>      
+  <div class="container">      
+    <h1>Web Tes Hafalan Nomor Ayat Al-Qur'an</h1>      
+    <h2>Mode Acak Ayat</h2>      
+      
+    <select id="surahSelect"><option value="">Pilih Surah</option></select>      
+    <input type="number" id="jumlahAngka" placeholder="Masukkan jumlah ayat" min="1" />      
+    <button onclick="mulaiAcak()">Mulai Acak</button>      
+      
+    <div id="output">0</div>      
+    <div class="info" id="info">Belum ada angka diacak</div>      
+      
+    <button onclick="tampilkanAngka()">Tampilkan soal</button>      
+    <button onclick="lihatAyat()">Lihat Ayat</button>      
+    <button onclick="putarAudio()">Putar Audio</button>      
+    <button onclick="resetSemua()" style="background: #e53935;">Reset</button>      
+      
+    <div id="ayatResult"></div>      
+    <div id="quizBox"></div>      
+    <div id="result"></div>      
+    <div id="summaryBox"></div>      
+  </div>      
+      
+  <script>      
+    let angkaTersisa = [], angkaSekarang = 0, daftarSurah = [], currentAudio = null;      
+    let scoreBenar = 0, scoreSalah = 0, soalSisa = 0;      
+      
+    async function loadSurah() {      
+      const res = await fetch('https://api.quran.gading.dev/surah');      
+      const data = await res.json();      
+      daftarSurah = data.data;      
+      const select = document.getElementById('surahSelect');      
+      daftarSurah.forEach(surah => {      
+        const option = document.createElement('option');      
+        option.value = surah.number;      
+        option.textContent = `${surah.number}. ${surah.name.transliteration.id} (${surah.name.short})`;      
+        select.appendChild(option);      
+      });      
+    }      
+      
+    document.getElementById('surahSelect').addEventListener('change', function () {      
+      const surah = daftarSurah.find(s => s.number == this.value);      
+      if (surah) {      
+        document.getElementById('jumlahAngka').max = surah.numberOfVerses;      
+        document.getElementById('jumlahAngka').placeholder = `Maks: ${surah.numberOfVerses}`;      
+      }      
+    });      
+      
+    function mulaiAcak() {      
+      const jumlah = parseInt(document.getElementById('jumlahAngka').value);      
+      const surahId = document.getElementById('surahSelect').value;      
+      const surah = daftarSurah.find(s => s.number == surahId);      
+      if (!surahId || !jumlah || jumlah < 1 || jumlah > surah.numberOfVerses) {      
+        alert("Periksa surah dan jumlah ayat!");      
+        return;      
+      }      
+      angkaTersisa = Array.from({ length: jumlah }, (_, i) => i + 1);      
+      acakArray(angkaTersisa);      
+      angkaSekarang = 0;      
+      soalSisa = jumlah;      
+      scoreBenar = 0;      
+      scoreSalah = 0;      
+      document.getElementById('output').textContent = "0";      
+      document.getElementById('info').textContent = `Tes dimulai (${jumlah} soal). Klik "Tampilkan Angka"`;      
+      document.getElementById('ayatResult').innerHTML = "";      
+      document.getElementById('quizBox').innerHTML = "";      
+      document.getElementById('summaryBox').innerHTML = "";      
+      document.getElementById('result').textContent = "";      
+    }      
+      
+    function acakArray(arr) {      
+      for (let i = arr.length - 1; i > 0; i--) {      
+        const j = Math.floor(Math.random() * (i + 1));      
+        [arr[i], arr[j]] = [arr[j], arr[i]];      
+      }      
+    }      
+      
+    async function tampilkanAngka() {      
+      if (angkaTersisa.length === 0) {      
+        document.getElementById('output').textContent = "🎉";      
+        document.getElementById('info').textContent = "Selesai! Semua soal telah dijawab.";      
+        document.getElementById('summaryBox').innerHTML = `      
+          <p>Benar: ${scoreBenar}</p>      
+          <p>Salah: ${scoreSalah}</p>      
+          <button onclick="mulaiAcak()">Tes Ulang</button>      
+          <button onclick="resetSemua()">Tes Baru</button>      
+        `;      
+        return;      
+      }      
+      angkaSekarang = angkaTersisa.pop();      
+      document.getElementById('info').textContent = `Soal ke-${scoreBenar + scoreSalah + 1}`;      
+      document.getElementById('output').textContent = "?";      
+      document.getElementById('ayatResult').innerHTML = "";      
+      document.getElementById('quizBox').innerHTML = "Memuat soal...";      
+      const surahId = document.getElementById('surahSelect').value;      
+      const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}/${angkaSekarang}`);      
+      const data = await res.json();      
+      const ayat = data.data;      
+      
+      const benar = ayat.number.inSurah;      
+      const options = [benar];      
+      while (options.length < 4) {      
+        const n = Math.floor(Math.random() * ayat.surah.numberOfVerses) + 1;      
+        if (!options.includes(n)) options.push(n);      
+      }      
+      acakArray(options);      
+      
+      let html = `<p>Ayat: <strong>${ayat.text.arab}</strong></p>`;      
+      options.forEach(opt => {      
+        html += `<div class="option" onclick="jawab(${opt}, ${benar}, this)"><strong>${String.fromCharCode(65 + options.indexOf(opt))}.</strong> ${opt}</div>`;      
+      });      
+      document.getElementById('quizBox').innerHTML = html;      
+    }      
+      
+    function jawab(jawaban, benar, el) {      
+      const options = document.querySelectorAll('.option');      
+      options.forEach(opt => opt.onclick = null);      
+      
+      if (jawaban === benar) {      
+        el.classList.add('correct');      
+        document.getElementById('result').textContent = "Jawaban Benar!";      
+        scoreBenar++;      
+      } else {      
+        el.classList.add('wrong');      
+        options.forEach(opt => {      
+          if (opt.textContent.includes(benar)) opt.classList.add('correct');      
+        });      
+        document.getElementById('result').textContent = `Jawaban Salah! Jawaban yang benar adalah ${benar}`;      
+        scoreSalah++;      
+      }      
+      
+      document.getElementById('output').textContent = angkaSekarang;      
+    }      
+      
+    async function lihatAyat() {      
+      const surahId = document.getElementById('surahSelect').value;      
+      if (!surahId || angkaSekarang === 0) {      
+        alert("Pilih surah dan tampilkan angka terlebih dahulu!");      
+        return;      
+      }      
+      const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}/${angkaSekarang}`);      
+      const data = await res.json();      
+      const ayat = data.data;      
+      document.getElementById('ayatResult').innerHTML = `      
+        <div id="surahInfo">Surah ${ayat.surah.name.transliteration.id} (QS. ${ayat.surah.number}:${ayat.number.inSurah})</div>      
+        <div id="arabic">${ayat.text.arab} <span class="ayatNumber">﴿${ayat.number.inSurah}﴾</span></div>      
+        <div id="translation">${ayat.translation.id}</div>      
+      `;      
+    }      
+      
+    async function putarAudio() {      
+      if (!angkaSekarang) return;      
+      const surahId = document.getElementById('surahSelect').value;      
+      const res = await fetch(`https://api.quran.gading.dev/surah/${surahId}/${angkaSekarang}`);      
+      const data = await res.json();      
+      const audioUrl = data.data.audio.primary;      
+      if (currentAudio) {      
+        currentAudio.pause();      
+        currentAudio.currentTime = 0;      
+      }      
+      currentAudio = new Audio(audioUrl);      
+      currentAudio.play();      
+    }      
+      
+    function resetSemua() {      
+      if (currentAudio) {      
+        currentAudio.pause();      
+        currentAudio.currentTime = 0;      
+      }      
+      angkaTersisa = [];      
+      angkaSekarang = 0;      
+      scoreBenar = 0;      
+      scoreSalah = 0;      
+      document.getElementById('output').textContent = "0";      
+      document.getElementById('info').textContent = "Belum ada angka diacak";      
+      document.getElementById('ayatResult').innerHTML = "";      
+      document.getElementById('quizBox').innerHTML = "";      
+      document.getElementById('result').textContent = "";      
+      document.getElementById('summaryBox').innerHTML = "";      
+      document.getElementById('jumlahAngka').value = "";      
+      document.getElementById('surahSelect').selectedIndex = 0;      
+    }      
+      
+    loadSurah();      
+  </script>      
+</body>      
+</html>  
