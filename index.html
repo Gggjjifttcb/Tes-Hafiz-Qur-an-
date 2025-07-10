@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tes Hafalan Ayat Al-Qur'an</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Amiri&display=swap" rel="stylesheet" />
   <style>
@@ -100,6 +101,8 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.08);
       text-align: left;
       border-left: 5px solid var(--primary);
+      overflow-x: auto;
+      word-break: break-word;
     }
     #surahInfo {
       font-size: 18px;
@@ -124,40 +127,60 @@
       line-height: 1.7;
       color: #333;
     }
+    /* Responsive styles for mobile */
     @media (max-width: 600px) {
       .container {
-        padding: 30px 20px;
+        padding: 18px 4px;
+        max-width: 100vw;
+        box-sizing: border-box;
+        border-radius: 0;
+      }
+      h1, h2 {
+        font-size: 1.2rem;
+      }
+      select, input, button {
+        font-size: 15px;
+        padding: 10px;
       }
       #arabic {
-        font-size: 28px;
+        font-size: 22px;
+        word-break: break-word;
+      }
+      #ayatResult {
+        padding: 14px;
+        font-size: 15px;
+      }
+      button {
+        width: 100%;
+        margin: 5px 0;
+        display: block;
+      }
+      #output {
+        font-size: 36px;
+      }
+      .info {
+        font-size: 14px;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Latihan  Hafalan Nomor Ayat Al-Qur'an</h1>
+    <h1>Latihan Hafalan Nomor Ayat Al-Qur'an</h1>
     <h2>Mode Acak Ayat</h2>
-
     <select id="surahSelect">
       <option value="">Pilih Surah</option>
     </select>
-
     <input type="number" id="jumlahAngka" placeholder="Masukkan jumlah ayat" min="1" />
-
     <button onclick="mulaiAcak()">Mulai Acak</button>
-
     <div id="output">0</div>
     <div class="info" id="info">Belum ada angka diacak</div>
-
     <button onclick="tampilkanAngka()">Tampilkan Ayat ke</button>
     <button onclick="lihatAyat()">Lihat Ayat</button>
     <button onclick="putarAudio()">Putar Audio</button>
     <button onclick="resetSemua()" style="background: #e53935;">Reset</button>
-
     <div id="ayatResult"></div>
   </div>
-
   <script>
     let angkaTersisa = [];
     let angkaSekarang = 0;
