@@ -75,7 +75,6 @@
     #audioControl {
       margin-top: 10px;
     }
-    /* Responsif untuk layar kecil */
     @media (max-width: 600px) {
       .container {
         padding: 10px;
@@ -192,7 +191,6 @@
       const data = await res.json();
       const ayat = data.data;
 
-      // Mainkan audio otomatis
       const audioUrl = ayat.audio.primary;
       if (currentAudio) currentAudio.pause();
       currentAudio = new Audio(audioUrl);
@@ -220,6 +218,7 @@
       }
       const options = document.querySelectorAll('.option');
       options.forEach(opt => opt.onclick = null);
+
       if (jawaban === benar) {
         el.classList.add('correct');
         document.getElementById('result').textContent = "Jawaban Benar!";
@@ -232,7 +231,13 @@
         document.getElementById('result').textContent = `Jawaban Salah! Jawaban benar: ${benar}`;
         scoreSalah++;
       }
+
       document.getElementById('output').textContent = angkaSekarang;
+
+      // Otomatis lanjut soal setelah 1.5 detik
+      setTimeout(() => {
+        tampilkanSoal();
+      }, 1500);
     }
 
     function resetSemua() {
